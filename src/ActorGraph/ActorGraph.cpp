@@ -107,8 +107,9 @@ void ActorGraph::addNodeAndMovie(string actor, string movie_title, int year) {
     } else if (hasNode && !hasMovie) {
         Movie movie(year, movies.size(), movie_title);
         Node node = nodes[nodeinfo[actor]];
+        // cout << node.getId() << endl;  //
         movie.addActor(node.getId());
-        node.addMovie(movie.getId());
+        nodes[nodeinfo[actor]].addMovie(movie.getId());
 
         movieinfo[movie_title] = movies.size();
 
@@ -116,7 +117,8 @@ void ActorGraph::addNodeAndMovie(string actor, string movie_title, int year) {
     } else if (!hasNode && hasMovie) {
         Node node(actor, movies.size(), nodes.size());
         Movie movie = movies[movieinfo[movie_title]];
-        movie.addActor(node.getId());
+        // movie.addActor(node.getId());
+        movies[movieinfo[movie_title]].addActor(node.getId());  //
 
         nodeinfo[actor] = nodes.size();
 
@@ -124,14 +126,23 @@ void ActorGraph::addNodeAndMovie(string actor, string movie_title, int year) {
     } else if (hasNode && hasMovie) {
         Node node = nodes[nodeinfo[actor]];
         Movie movie = movies[movieinfo[movie_title]];
-        movie.addActor(node.getId());
-        node.addMovie(movie.getId());
+        movies[movieinfo[movie_title]].addActor(node.getId());
+        nodes[nodeinfo[actor]].addMovie(movie.getId());
     } else {
         cout << "Branch error!" << endl;
     }
 }
 
 void ActorGraph::buildEdges(bool use_weighted_edges) {
+    for (int i = 0; i < movies.size(); i++) {
+        map<int, Edges> newmap;
+        edges.push_back(newmap);
+        // cout << "movie " << i << " : " << movies[i].getName() << "'s actors:
+        // "; for (int j = 0; j < movies[i].getActor().size(); j++) {
+        //     cout << " " << movies[i].getActor()[j];
+        // }
+        // cout << "" << endl;
+    }
     for (int i = 0; i < movies.size(); i++) {
         int weight =
             (use_weighted_edges) ? (1 - (2019 - movies[i].getYear())) : 1;
@@ -149,7 +160,6 @@ void ActorGraph::buildEdges4Movie(Movie movie, int weight) {
             int actorIdTwo = actorsOfMovie[j];
             map<int, Edges> mapOfActorOne = edges[actorIdOne];
             map<int, Edges> mapOfActorTwo = edges[actorIdTwo];
-
             if (mapOfActorOne.find(actorIdTwo) == mapOfActorOne.end()) {
                 Edges edge(actorIdOne, actorIdTwo, id, weight);
                 mapOfActorOne[actorIdTwo] = edge;
@@ -163,8 +173,7 @@ void ActorGraph::buildEdges4Movie(Movie movie, int weight) {
             } else {
                 mapOfActorTwo[actorIdOne].addSharedMovie(id);
             }
-
-            this->totalEdges++;
+            this->totalEdges += 2;
         }
     }
 }

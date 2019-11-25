@@ -16,9 +16,14 @@ Node::Node(string name, int movieId, int id) {
     this->name = name;
     this->addMovie(movieId);
     this->id = id;
+    // cout << id << endl;
 }
 
-void Node::addMovie(int movieId) { this->movies.push_back(movieId); }
+void Node::addMovie(int movieId) {
+    this->movies.push_back(movieId);
+    // cout << id << " add " << movieId << " and then size is " << movies.size()
+    //      << endl;
+}
 
 int Node::getId() { return this->id; }
 

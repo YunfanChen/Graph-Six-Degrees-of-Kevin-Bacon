@@ -22,7 +22,11 @@ int Movie::getId() { return this->id; }
 
 string Movie::getName() { return this->name; }
 
-void Movie::addActor(int actorId) { actors.push_back(actorId); }
+void Movie::addActor(int actorId) {
+    actors.push_back(actorId);
+    // cout << id << " add " << actorId << " and then size is " << actors.size()
+    //      << endl;
+}
 
 int Movie::getYear() { return this->year; }
 
