@@ -25,6 +25,8 @@ void Node::addMovie(int movieId) {
     //      << endl;
 }
 
+vector<int> Node::getMovies() { return this->movies; }
+
 int Node::getId() { return this->id; }
 
 string Node::getName() { return this->name; }

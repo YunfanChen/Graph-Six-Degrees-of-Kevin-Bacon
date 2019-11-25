@@ -83,8 +83,8 @@ bool ActorGraph::loadFromFile(const char* in_filename,
     infile.close();
 
     buildEdges(use_weighted_edges);
-    cout << "Total nodes are: " << nodes.size() << endl;
-    cout << "Total movies are: " << movies.size() << endl;
+    // cout << "Total nodes are: " << nodes.size() << endl;
+    // cout << "Total movies are: " << movies.size() << endl;
 
     return true;
 }
@@ -107,7 +107,7 @@ void ActorGraph::addNodeAndMovie(string actor, string movie_title, int year) {
     } else if (hasNode && !hasMovie) {
         Movie movie(year, movies.size(), movie_title);
         Node node = nodes[nodeinfo[actor]];
-        // cout << node.getId() << endl;  //
+
         movie.addActor(node.getId());
         nodes[nodeinfo[actor]].addMovie(movie.getId());
 
@@ -115,10 +115,10 @@ void ActorGraph::addNodeAndMovie(string actor, string movie_title, int year) {
 
         movies.push_back(movie);
     } else if (!hasNode && hasMovie) {
-        Node node(actor, movies.size(), nodes.size());
         Movie movie = movies[movieinfo[movie_title]];
-        // movie.addActor(node.getId());
-        movies[movieinfo[movie_title]].addActor(node.getId());  //
+        Node node(actor, movie.getId(), nodes.size());
+
+        movies[movieinfo[movie_title]].addActor(node.getId());
 
         nodeinfo[actor] = nodes.size();
 
@@ -134,6 +134,13 @@ void ActorGraph::addNodeAndMovie(string actor, string movie_title, int year) {
 }
 
 void ActorGraph::buildEdges(bool use_weighted_edges) {
+    // for (int i = 0; i < nodes.size(); i++) {
+    //     cout << "actor " << i << " : " << nodes[i].getName() << "'s movies:";
+    //     for (int j = 0; j < nodes[i].getMovies().size(); j++) {
+    //         cout << " " << nodes[i].getMovies()[j];
+    //     }
+    //     cout << "" << endl;
+    // }
     for (int i = 0; i < movies.size(); i++) {
         map<int, Edges> newmap;
         edges.push_back(newmap);
@@ -148,7 +155,7 @@ void ActorGraph::buildEdges(bool use_weighted_edges) {
             (use_weighted_edges) ? (1 - (2019 - movies[i].getYear())) : 1;
         buildEdges4Movie(movies[i], weight);
     }
-    cout << "Total edges are: " << this->totalEdges << endl;
+    // cout << "Total edges are: " << this->totalEdges << endl;
 }
 
 void ActorGraph::buildEdges4Movie(Movie movie, int weight) {

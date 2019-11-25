@@ -29,6 +29,8 @@ class Node {
 
     int getId();
 
+    vector<int> getMovies();
+
     string getName();
 };
 
