@@ -89,11 +89,9 @@ bool ActorGraph::loadFromFile(const char* in_filename,
         return false;
     }
     infile.close();
-
     buildEdges(use_weighted_edges);
     // cout << "Total nodes are: " << nodes.size() << endl;
     // cout << "Total movies are: " << movies.size() << endl;
-
     return true;
 }
 
@@ -146,7 +144,6 @@ void ActorGraph::buildEdges(bool use_weighted_edges) {
         map<int, Edges> newmap;
         edges.push_back(newmap);
     }
-
     for (int i = 0; i < movies.size(); i++) {
         int weight =
             (use_weighted_edges) ? (1 - (2019 - movies[i].getYear())) : 1;
