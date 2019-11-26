@@ -93,7 +93,14 @@ vector<string> predictUnCollaborated(int nodeId, ActorGraph* graph) {
         P nodePair;
         nodePair = pq.top();
         pq.pop();
-        top4.push_back(nodePair.first.getName());
+        for (int i = 0; i < top4.size(); i++) {
+            if (nodePair.first.getName() == top4[i])
+                continue;
+            else {
+                top4.push_back(nodePair.first.getName());
+                break;
+            }
+        }
     }
     return top4;
 }
