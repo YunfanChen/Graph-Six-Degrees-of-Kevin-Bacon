@@ -10,7 +10,9 @@
 #include <iostream>
 #include <vector>
 
-Edges::Edges(){};
+Edges::Edges() {}
+
+vector<int>& Edges::getShared_movie() { return shared_movie; }
 
 Edges::Edges(int node_one, int node_two, int movieId, int weight) {
     this->node_one = node_one;

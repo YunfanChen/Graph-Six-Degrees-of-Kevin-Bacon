@@ -29,6 +29,8 @@ class Edges {
     void addSharedMovie(int movieId);
 
     void setWeight(int weight);
+
+    vector<int>& getShared_movie();
 };
 
 #endif

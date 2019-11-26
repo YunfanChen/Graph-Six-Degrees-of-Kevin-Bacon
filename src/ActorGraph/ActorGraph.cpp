@@ -22,6 +22,14 @@ using namespace std;
  */
 ActorGraph::ActorGraph(void) {}
 
+vector<Node>& ActorGraph::getNodes() { return nodes; }
+
+vector<Movie>& ActorGraph::getMovies() { return movies; }
+
+vector<map<int, Edges>>& ActorGraph::getEdges() { return edges; }
+
+map<string, int>& ActorGraph::getNodeinfo() { return nodeinfo; }
+
 /** You can modify this method definition as you wish
  *
  * Load the graph from a tab-delimited file of actor->movie relationships.
@@ -90,17 +98,17 @@ bool ActorGraph::loadFromFile(const char* in_filename,
 }
 
 void ActorGraph::addNodeAndMovie(string actor, string movie_title, int year) {
-    movie_title = movie_title + " " + to_string(year);
+    string movie_key = movie_title + " " + to_string(year);
     bool hasNode = (nodeinfo.find(actor) == nodeinfo.end()) ? false : true;
     bool hasMovie =
-        (movieinfo.find(movie_title) == movieinfo.end()) ? false : true;
+        (movieinfo.find(movie_key) == movieinfo.end()) ? false : true;
     if (!hasNode && !hasMovie) {
         Node node(actor, movies.size(), nodes.size());
         Movie movie(year, movies.size(), movie_title);
         movie.addActor(node.getId());
 
         nodeinfo[actor] = nodes.size();
-        movieinfo[movie_title] = movies.size();
+        movieinfo[movie_key] = movies.size();
 
         movies.push_back(movie);
         nodes.push_back(node);
@@ -111,22 +119,22 @@ void ActorGraph::addNodeAndMovie(string actor, string movie_title, int year) {
         movie.addActor(node.getId());
         nodes[nodeinfo[actor]].addMovie(movie.getId());
 
-        movieinfo[movie_title] = movies.size();
+        movieinfo[movie_key] = movies.size();
 
         movies.push_back(movie);
     } else if (!hasNode && hasMovie) {
-        Movie movie = movies[movieinfo[movie_title]];
+        Movie movie = movies[movieinfo[movie_key]];
         Node node(actor, movie.getId(), nodes.size());
 
-        movies[movieinfo[movie_title]].addActor(node.getId());
+        movies[movieinfo[movie_key]].addActor(node.getId());
 
         nodeinfo[actor] = nodes.size();
 
         nodes.push_back(node);
     } else if (hasNode && hasMovie) {
         Node node = nodes[nodeinfo[actor]];
-        Movie movie = movies[movieinfo[movie_title]];
-        movies[movieinfo[movie_title]].addActor(node.getId());
+        Movie movie = movies[movieinfo[movie_key]];
+        movies[movieinfo[movie_key]].addActor(node.getId());
         nodes[nodeinfo[actor]].addMovie(movie.getId());
     } else {
         cout << "Branch error!" << endl;
@@ -134,28 +142,16 @@ void ActorGraph::addNodeAndMovie(string actor, string movie_title, int year) {
 }
 
 void ActorGraph::buildEdges(bool use_weighted_edges) {
-    // for (int i = 0; i < nodes.size(); i++) {
-    //     cout << "actor " << i << " : " << nodes[i].getName() << "'s movies:";
-    //     for (int j = 0; j < nodes[i].getMovies().size(); j++) {
-    //         cout << " " << nodes[i].getMovies()[j];
-    //     }
-    //     cout << "" << endl;
-    // }
     for (int i = 0; i < movies.size(); i++) {
         map<int, Edges> newmap;
         edges.push_back(newmap);
-        // cout << "movie " << i << " : " << movies[i].getName() << "'s actors:
-        // "; for (int j = 0; j < movies[i].getActor().size(); j++) {
-        //     cout << " " << movies[i].getActor()[j];
-        // }
-        // cout << "" << endl;
     }
+
     for (int i = 0; i < movies.size(); i++) {
         int weight =
             (use_weighted_edges) ? (1 - (2019 - movies[i].getYear())) : 1;
         buildEdges4Movie(movies[i], weight);
     }
-    // cout << "Total edges are: " << this->totalEdges << endl;
 }
 
 void ActorGraph::buildEdges4Movie(Movie movie, int weight) {
@@ -180,6 +176,8 @@ void ActorGraph::buildEdges4Movie(Movie movie, int weight) {
             } else {
                 mapOfActorTwo[actorIdOne].addSharedMovie(id);
             }
+            edges[actorIdOne] = mapOfActorOne;
+            edges[actorIdTwo] = mapOfActorTwo;
             this->totalEdges += 2;
         }
     }

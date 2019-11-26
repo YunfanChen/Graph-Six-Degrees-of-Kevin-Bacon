@@ -59,6 +59,14 @@ class ActorGraph {
      * return true if file was loaded sucessfully, false otherwise
      */
     bool loadFromFile(const char* in_filename, bool use_weighted_edges);
+
+    vector<Node>& getNodes();
+
+    vector<Movie>& getMovies();
+
+    vector<map<int, Edges>>& getEdges();
+
+    map<string, int>& getNodeinfo();
 };
 
 #endif  // ACTORGRAPH_HPP

@@ -11,3 +11,8 @@ buildGraph_exe = executable('buildGraph.cpp.executable',
     sources: ['buildGraph.cpp'],
     dependencies : [actorgraph_dep, elements_dep, movie_dep, edges_dep, node_dep],
     install : true)
+
+pathfinder_exe = executable('pathfinder.cpp.executable', 
+    sources: ['pathfinder.cpp'],
+    dependencies : [actorgraph_dep, elements_dep, movie_dep, edges_dep, node_dep],
+    install : true)
