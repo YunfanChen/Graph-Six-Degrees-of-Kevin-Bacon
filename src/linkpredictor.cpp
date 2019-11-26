@@ -49,11 +49,13 @@ vector<string> predictCollaborated(int nodeId, ActorGraph* graph) {
     }
     P popNode;
     vector<string> top4;
-    for (int i = 0; i < 4; i++) {
-        if (pq.empty()) break;
-        popNode = pq.top();
-        top4.push_back(popNode.first.getName());
-        pq.pop();
+    for (int i = 0; top4.size() < 4; i++) {
+        if (popNode.first.getName() == top4[i])
+            continue;
+        else {
+            top4.push_back(popNode.first.getName());
+            break;
+        }
     }
     return top4;
 }
@@ -93,7 +95,7 @@ vector<string> predictUnCollaborated(int nodeId, ActorGraph* graph) {
         P nodePair;
         nodePair = pq.top();
         pq.pop();
-        for (int i = 0; i < top4.size(); i++) {
+        for (int i = 0; top4.size() < 4; i++) {
             if (nodePair.first.getName() == top4[i])
                 continue;
             else {
