@@ -47,17 +47,19 @@ vector<string> predictCollaborated(int nodeId, ActorGraph* graph) {
             pq.push(P(nodes[neighborId], priority));
         }
     }
-    P popNode;
-    vector<string> top4;
+    set<string> top4;
+    vector<string> top4vec;
     for (int i = 0; top4.size() < 4; i++) {
-        if (popNode.first.getName() == top4[i])
-            continue;
-        else {
-            top4.push_back(popNode.first.getName());
-            break;
+        if (pq.empty()) break;
+        P nodePair;
+        nodePair = pq.top();
+        pq.pop();
+        if (top4.find(nodePair.first.getName()) == top4.end()) {
+            top4vec.push_back(nodePair.first.getName());
         }
+        top4.insert(nodePair.first.getName());
     }
-    return top4;
+    return top4vec;
 }
 
 vector<string> predictUnCollaborated(int nodeId, ActorGraph* graph) {
@@ -89,22 +91,19 @@ vector<string> predictUnCollaborated(int nodeId, ActorGraph* graph) {
             pq.push(P(nodes[neighborLevel2Id], priority[neighborLevel2Id]));
         }
     }
-    vector<string> top4;
-    for (int i = 0; top4.size() <= 4; i++) {
+    set<string> top4;
+    vector<string> top4vec;
+    for (int i = 0; top4.size() < 4; i++) {
         if (pq.empty()) break;
         P nodePair;
         nodePair = pq.top();
         pq.pop();
-        for (int i = 0; top4.size() < 4; i++) {
-            if (nodePair.first.getName() == top4[i])
-                continue;
-            else {
-                top4.push_back(nodePair.first.getName());
-                break;
-            }
+        if (top4.find(nodePair.first.getName()) == top4.end()) {
+            top4vec.push_back(nodePair.first.getName());
         }
+        top4.insert(nodePair.first.getName());
     }
-    return top4;
+    return top4vec;
 }
 
 void readFromFile(const char* in_filename, string outFileName,
