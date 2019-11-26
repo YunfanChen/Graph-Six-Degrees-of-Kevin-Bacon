@@ -140,7 +140,7 @@ void ActorGraph::addNodeAndMovie(string actor, string movie_title, int year) {
 }
 
 void ActorGraph::buildEdges(bool use_weighted_edges) {
-    for (int i = 0; i < movies.size(); i++) {
+    for (int i = 0; i < nodes.size(); i++) {
         map<int, Edges> newmap;
         edges.push_back(newmap);
     }
