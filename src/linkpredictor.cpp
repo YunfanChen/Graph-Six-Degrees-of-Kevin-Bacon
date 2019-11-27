@@ -33,6 +33,8 @@ vector<string> predictCollaborated(int nodeId, ActorGraph* graph) {
     for (auto iter = neighbor.begin(); iter != neighbor.end(); iter++) {
         int neighborId = iter->first;
         int priority = 0;
+        pq.push(P(nodes[neighborId], 0));
+
         for (auto iter2 = neighbor.begin(); iter2 != neighbor.end(); iter2++) {
             if (iter2 == iter) continue;
             int thirdNodeId = iter2->first;
