@@ -17,9 +17,9 @@ typedef pair<Node, int> P;
  */
 struct NodePtrComp {
     /* Implement a comparator of node in struct NodePtrComp. */
-    bool operator()(P p1, P p2) const {
+    bool operator()(P& p1, P& p2) const {
         if (p1.second == p2.second) {
-            return p1.first.getName() > p1.first.getName();
+            return p1.first.getName() > p2.first.getName();
         }
         return p1.second < p2.second;
     }
@@ -30,6 +30,8 @@ vector<string> predictCollaborated(int nodeId, ActorGraph* graph) {
     vector<map<int, Edges>> edges = graph->getEdges();
     vector<Node> nodes = graph->getNodes();
     map<int, Edges> neighbor = edges[nodeId];
+    // cout << "-------For " << nodes[nodeId].getName() << "-------------------"
+    // << endl;
     for (auto iter = neighbor.begin(); iter != neighbor.end(); iter++) {
         int neighborId = iter->first;
         int priority = 0;
@@ -56,8 +58,11 @@ vector<string> predictCollaborated(int nodeId, ActorGraph* graph) {
         P nodePair;
         nodePair = pq.top();
         pq.pop();
+        // cout << nodePair.first.getName() << " dequeue......" << endl;
         if (top4.find(nodePair.first.getName()) == top4.end()) {
             top4vec.push_back(nodePair.first.getName());
+            // cout << "collected: " << nodePair.first.getName()
+            //      << " enqueue ,priority is: " << nodePair.second << endl;
         }
         top4.insert(nodePair.first.getName());
     }
@@ -72,6 +77,8 @@ vector<string> predictUnCollaborated(int nodeId, ActorGraph* graph) {
     map<int, Edges> neighbor = edges[nodeId];
     vector<bool> visited(nodes.size(), false);
     visited[nodeId] = true;
+    // cout << "-------For " << nodes[nodeId].getName() << "-------------------"
+    // << endl;
     for (auto iter = neighbor.begin(); iter != neighbor.end(); iter++) {
         int neighborLevel1Id = iter->first;
         visited[neighborLevel1Id] = true;
@@ -100,8 +107,11 @@ vector<string> predictUnCollaborated(int nodeId, ActorGraph* graph) {
         P nodePair;
         nodePair = pq.top();
         pq.pop();
+        // cout << nodePair.first.getName() << "dequeue......" << endl;
         if (top4.find(nodePair.first.getName()) == top4.end()) {
             top4vec.push_back(nodePair.first.getName());
+            // cout << "un collected: " << nodePair.first.getName()
+            //      << " enqueue ,priority is: " << nodePair.second << endl;
         }
         top4.insert(nodePair.first.getName());
     }
