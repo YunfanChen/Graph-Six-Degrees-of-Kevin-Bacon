@@ -1,5 +1,5 @@
 /**
- * ActorGraph.hpp
+ * Node.hpp
  * Author: Yunfan Chen
  * Date:   2019.11.23
  *
@@ -12,7 +12,9 @@
 #include <vector>
 using namespace std;
 
-/** class header */
+/**
+ * This class is for movie
+ */
 class Node {
   private:
     string name;
@@ -20,17 +22,37 @@ class Node {
     int id;
 
   public:
-    /* initialize variables */
+    /**
+     * This class represents an node which is an actor.
+     */
     Node();
 
+    /**
+     * main constructor
+     * name: the name of the actor
+     * movieId: a movie this actor acted
+     * id: the id of this actor.
+     */
     Node(string name, int movieId, int id);
 
+    /**
+     *  Add a movie to this node.
+     */
     void addMovie(int movieId);
 
+    /**
+     * Get the id of this node
+     */
     int getId();
 
+    /**
+     * Get all the movies for this node
+     */
     vector<int> getMovies();
 
+    /**
+     * Get the name of this actor
+     */
     string getName();
 };
 

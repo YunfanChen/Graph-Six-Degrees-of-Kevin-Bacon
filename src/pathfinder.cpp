@@ -1,3 +1,11 @@
+/*
+ * pathfinder.cpp
+ * Author: Yunfan Chen
+ * Date:   2019.11.27
+ *
+ * This file means to find the shortest way from one actor to another. And
+ * output the path in a file.
+ */
 #include <ActorGraph.hpp>
 #include <fstream>
 #include <iostream>
@@ -8,6 +16,10 @@
 
 using namespace std;
 
+/**
+ * This function is implementing BFS from one actor node in the graph. And
+ * finally return a path save in a vector<string>.
+ */
 vector<string> bfs(int startId, int endId, ActorGraph* graph) {
     vector<Node> nodes = graph->getNodes();             // get the node list
     vector<map<int, Edges>> edges = graph->getEdges();  // get the edges list
@@ -41,9 +53,9 @@ vector<string> bfs(int startId, int endId, ActorGraph* graph) {
         }
     }
 
-    vector<string> path;
+    vector<string> path;  // save the path for both movie an actor
     if (find == false) {
-        return path;
+        return path;  // cannot find the endnode, then they are unconnected
     }
     int preId = endId;
     path.push_back(nodes[preId].getName());
@@ -54,7 +66,9 @@ vector<string> bfs(int startId, int endId, ActorGraph* graph) {
         vector<int> shared_movie = edgee.getShared_movie();
         int movieId = shared_movie[0];
         Movie movie = movies[movieId];
-        string movie_info = movie.getName() + "#@" + to_string(movie.getYear());
+        string movie_info =
+            movie.getName() + "#@" +
+            to_string(movie.getYear());  // the movie they shared
         path.push_back(movie_info);
         path.push_back(nodes[nextId].getName());
         preId = nextId;
@@ -62,6 +76,10 @@ vector<string> bfs(int startId, int endId, ActorGraph* graph) {
     return path;
 }
 
+/**
+ * Read test actors from input file, through BFS method get the path and write
+ * in a output file.
+ */
 void readFromFile(const char* in_filename, string outFileName,
                   ActorGraph* graph) {
     ifstream infile(in_filename);
@@ -128,6 +146,9 @@ void readFromFile(const char* in_filename, string outFileName,
     fileout.close();
 }
 
+/**
+ * Main method.
+ */
 int main(int argc, char* argv[]) {
     string ifWeighted(argv[2]);  // save "u" or "w"
     bool weighted = false;
@@ -137,4 +158,3 @@ int main(int argc, char* argv[]) {
     string outFileName(argv[4]);
     readFromFile(argv[3], outFileName, &graph);
 }
-// /Code/cse100_pa4/data/myoutput_path_u.tsv

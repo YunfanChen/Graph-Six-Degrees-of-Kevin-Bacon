@@ -1,7 +1,7 @@
 /*
  * ActorGraph.hpp
- * Author: <YOUR NAME HERE>
- * Date:   <DATE HERE>
+ * Author: Yunfan Chen
+ * Date:   2019.11.25
  *
  * This file is meant to exist as a container for starter code that you can use
  * to read the input file format defined imdb_2019.tsv. Feel free to modify
@@ -17,12 +17,10 @@
 #include <iostream>
 #include <map>
 
-// Maybe include some data structures here
-
 using namespace std;
 
 /**
- * TODO: add class header
+ * This is the class for graph
  */
 class ActorGraph {
   protected:
@@ -34,10 +32,19 @@ class ActorGraph {
     map<string, int> movieinfo;     // key is movie's name, value is the index
     int totalEdges;                 // the number of total edges
 
+    /**
+     * Adding nodes and movies to an empty graph.
+     */
     void addNodeAndMovie(string actor, string movie_title, int year);
 
+    /**
+     * Adding edges to a graph only has nodes and movies.
+     */
     void buildEdges(bool use_weighted_edges);
 
+    /**
+     * For each movie, add edges between all the actors who involve.
+     */
     void buildEdges4Movie(Movie movie, int weight);
 
   public:
@@ -46,9 +53,7 @@ class ActorGraph {
      */
     ActorGraph(void);
 
-    // Maybe add some more methods here
-
-    /** You can modify this method definition as you wish
+    /**
      *
      * Load the graph from a tab-delimited file of actor->movie relationships.
      *
@@ -60,12 +65,24 @@ class ActorGraph {
      */
     bool loadFromFile(const char* in_filename, bool use_weighted_edges);
 
+    /**
+     *  return all the nodes as a vector.
+     */
     vector<Node>& getNodes();
 
+    /**
+     *  return all the movies as a vector.
+     */
     vector<Movie>& getMovies();
 
+    /**
+     *  return all the edges as a vector.
+     */
     vector<map<int, Edges>>& getEdges();
 
+    /**
+     *  return nodeinfo as a map.
+     */
     map<string, int>& getNodeinfo();
 };
 

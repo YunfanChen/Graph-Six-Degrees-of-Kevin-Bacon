@@ -1,3 +1,12 @@
+/*
+ * linkpredictor.cpp
+ * Author: Yunfan Chen
+ * Date:   2019.11.27
+ *
+ * This file means to find the two subparts - the first where we predict
+ * future collaborations between actors who have collaborated in the past and
+ * the second where we predict new collaborations between actors.
+ */
 #include <ActorGraph.hpp>
 #include <fstream>
 #include <iostream>
@@ -11,9 +20,10 @@ using namespace std;
 
 typedef pair<Node, int> P;
 
-/* Comparator of HCNode pointer. In priority queue, HCNode ptr with lower count
- * has higher priority, and if count is the same, HCNode ptr with larger symbol
- * has higher prioruty.
+/**
+ * Comparator of Node. In priority queue, Node higher priority(int)
+ * has higher priority, and if count is the same, Node.getName() with lower
+ * symbol has higher prioruty.
  */
 struct NodePtrComp {
     /* Implement a comparator of node in struct NodePtrComp. */
@@ -25,18 +35,23 @@ struct NodePtrComp {
     }
 };
 
+/**
+ * For a given actor/actress graph and a given query Actor A, find out which
+ * contains actors who have collaborated with Actor A in the past, and output
+ * the top 4 priority of them.
+ */
 vector<string> predictCollaborated(int nodeId, ActorGraph* graph) {
-    priority_queue<P, vector<P>, NodePtrComp> pq;
-    vector<map<int, Edges>> edges = graph->getEdges();
-    vector<Node> nodes = graph->getNodes();
-    map<int, Edges> neighbor = edges[nodeId];
-    // cout << "-------For " << nodes[nodeId].getName() << "-------------------"
-    // << endl;
+    priority_queue<P, vector<P>, NodePtrComp> pq;  // priority queue
+    vector<map<int, Edges>> edges =
+        graph->getEdges();                     // get all edges in graph
+    vector<Node> nodes = graph->getNodes();    // get all nodes in graph
+    map<int, Edges> neighbor = edges[nodeId];  // given node's neighbor
     for (auto iter = neighbor.begin(); iter != neighbor.end(); iter++) {
         int neighborId = iter->first;
         int priority = 0;
+        // all the neighbor initially set priority is 0
         pq.push(P(nodes[neighborId], 0));
-
+        // then update each neighbor bode according to the rule
         for (auto iter2 = neighbor.begin(); iter2 != neighbor.end(); iter2++) {
             if (iter2 == iter) continue;
             int thirdNodeId = iter2->first;
@@ -47,44 +62,51 @@ vector<string> predictCollaborated(int nodeId, ActorGraph* graph) {
                 priority += neighborMap[thirdNodeId].getShared_movie().size() *
                             neighbor[thirdNodeId].getShared_movie().size();
             }
-            //(nodes[neighborId],priority)
-            pq.push(P(nodes[neighborId], priority));
+            pq.push(P(nodes[neighborId],
+                      priority));  // push the node and its priority into pq
         }
     }
-    set<string> top4;
-    vector<string> top4vec;
+    set<string> top4;  // top4 node set, inorder to eliminate the same node
+    vector<string> top4vec;  // actually top4 node for return
     for (int i = 0; top4.size() < 4; i++) {
         if (pq.empty()) break;
         P nodePair;
         nodePair = pq.top();
         pq.pop();
-        // cout << nodePair.first.getName() << " dequeue......" << endl;
         if (top4.find(nodePair.first.getName()) == top4.end()) {
-            top4vec.push_back(nodePair.first.getName());
-            // cout << "collected: " << nodePair.first.getName()
-            //      << " enqueue ,priority is: " << nodePair.second << endl;
+            top4vec.push_back(
+                nodePair.first.getName());  // if not in set, then we haven't
+                                            // collect this node
         }
-        top4.insert(nodePair.first.getName());
+        top4.insert(nodePair.first.getName());  // insert this node into the set
     }
     return top4vec;
 }
 
+/**
+ * For a given actor/actress graph and a given query Actor A, find out which
+ * have not yet collaborated with Actor A in the past, and output the top 4
+ * priority of them.
+ */
 vector<string> predictUnCollaborated(int nodeId, ActorGraph* graph) {
-    priority_queue<P, vector<P>, NodePtrComp> pq;
-    vector<map<int, Edges>> edges = graph->getEdges();
-    vector<Node> nodes = graph->getNodes();
-    vector<int> priority(nodes.size(), 0);
-    map<int, Edges> neighbor = edges[nodeId];
-    vector<bool> visited(nodes.size(), false);
-    visited[nodeId] = true;
-    // cout << "-------For " << nodes[nodeId].getName() << "-------------------"
-    // << endl;
+    priority_queue<P, vector<P>, NodePtrComp> pq;  // priority queue
+    vector<map<int, Edges>> edges =
+        graph->getEdges();                     // get all edges from graph
+    vector<Node> nodes = graph->getNodes();    // get all nodes from graph
+    vector<int> priority(nodes.size(), 0);     // priority vector for all nodes
+    map<int, Edges> neighbor = edges[nodeId];  // neighbor of the given node
+    vector<bool> visited(nodes.size(),
+                         false);  // mark if a node has been visited
+    visited[nodeId] = true;       // set the starter as visited
+    // first set all the neighbor of the start node as visited and save the
+    // number of edges between every neighbor and start node
     for (auto iter = neighbor.begin(); iter != neighbor.end(); iter++) {
         int neighborLevel1Id = iter->first;
         visited[neighborLevel1Id] = true;
         priority[neighborLevel1Id] =
             neighbor[neighborLevel1Id].getShared_movie().size();
     }
+    // then update every third node's priority
     for (auto iter = neighbor.begin(); iter != neighbor.end(); iter++) {
         int neighborLevel1Id = iter->first;
         map<int, Edges> neighborOfNeighbor = edges[neighborLevel1Id];
@@ -100,24 +122,27 @@ vector<string> predictUnCollaborated(int nodeId, ActorGraph* graph) {
             pq.push(P(nodes[neighborLevel2Id], priority[neighborLevel2Id]));
         }
     }
-    set<string> top4;
-    vector<string> top4vec;
+    set<string> top4;  // top4 node set, inorder to eliminate the same node
+    vector<string> top4vec;  // actually top4 node for return
     for (int i = 0; top4.size() < 4; i++) {
         if (pq.empty()) break;
         P nodePair;
         nodePair = pq.top();
         pq.pop();
-        // cout << nodePair.first.getName() << "dequeue......" << endl;
         if (top4.find(nodePair.first.getName()) == top4.end()) {
-            top4vec.push_back(nodePair.first.getName());
-            // cout << "un collected: " << nodePair.first.getName()
-            //      << " enqueue ,priority is: " << nodePair.second << endl;
+            top4vec.push_back(
+                nodePair.first.getName());  // if not in set, then we haven't
+                                            // collect this node
         }
-        top4.insert(nodePair.first.getName());
+        top4.insert(nodePair.first.getName());  // insert this node into the set
     }
     return top4vec;
 }
 
+/**
+ * This method read test actors' name from input file, then run two prediction
+ * methods, and finally output the result to an output file.
+ */
 void readFromFile(const char* in_filename, string outFileName,
                   string outFileName2, ActorGraph* graph) {
     ifstream infile(in_filename);
@@ -191,9 +216,11 @@ void readFromFile(const char* in_filename, string outFileName,
     fileout2.close();
 }
 
+/**
+ * Main method.
+ */
 int main(int argc, char* argv[]) {
     ActorGraph graph;
     graph.loadFromFile(argv[1], false);
     readFromFile(argv[2], argv[3], argv[4], &graph);
 }
-// /Code/cse100_pa4/data/myoutput_path_u.tsv
