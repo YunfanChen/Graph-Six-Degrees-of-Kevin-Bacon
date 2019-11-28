@@ -17,6 +17,9 @@
 
 using namespace std;
 
+/******************************** stat *********************************/
+vector<double> node_stat(4, 0.0);
+
 /**
  * Constructor of the Actor graph
  */
@@ -40,7 +43,7 @@ vector<map<int, Edges>>& ActorGraph::getEdges() { return edges; }
 /**
  *  return nodeinfo as a map.
  */
-map<string, int>& ActorGraph::getNodeinfo() { return nodeinfo; }
+unordered_map<string, int>& ActorGraph::getNodeinfo() { return nodeinfo; }
 
 /**
  *
@@ -52,11 +55,12 @@ map<string, int>& ActorGraph::getNodeinfo() { return nodeinfo; }
  *
  * return true if file was loaded sucessfully, false otherwise
  */
+#include <ctime>
 bool ActorGraph::loadFromFile(const char* in_filename,
                               bool use_weighted_edges) {
     // Initialize the file stream
     ifstream infile(in_filename);
-
+    clock_t read_start = clock();
     bool have_header = false;
 
     // keep reading lines until the end of file is reached
@@ -101,15 +105,32 @@ bool ActorGraph::loadFromFile(const char* in_filename,
         return false;
     }
     infile.close();
+
+    clock_t read_end = clock();
+    // cout << "stat result: \n";
+    // cout << "\t0: " << node_stat[0] << endl;
+    // cout << "\t1: " << node_stat[1] << endl;
+    // cout << "\t2: " << node_stat[2] << endl;
+    // cout << "\t3: " << node_stat[3] << endl;
+    // cout << "total read time: "
+    //      << read_end / (double)CLOCKS_PER_SEC -
+    //             read_start / (double)CLOCKS_PER_SEC
+    //      << endl;
     // add edges
+    clock_t edge_start = clock();
     buildEdges(use_weighted_edges);
+    clock_t edge_end = clock();
+    // cout << "edge stat time: "
+    //      << edge_end / (double)CLOCKS_PER_SEC -
+    //             edge_start / (double)CLOCKS_PER_SEC
+    //      << endl;
     return true;
 }
 
 /**
  * Adding nodes and movies to an graph.
  */
-void ActorGraph::addNodeAndMovie(string actor, string movie_title, int year) {
+void ActorGraph::addNodeAndMovie(string& actor, string& movie_title, int year) {
     // since may some movies have same name, I use title+year as key
     string movie_key = movie_title + " " + to_string(year);
     // two flag indicate if create a new object or just renew the object we
@@ -118,6 +139,9 @@ void ActorGraph::addNodeAndMovie(string actor, string movie_title, int year) {
     bool hasMovie =
         (movieinfo.find(movie_key) == movieinfo.end()) ? false : true;
     // for new movie and new actor
+    /******************************** stat *********************************/
+    clock_t stat_start = clock();
+    int branch_case = 0;
     if (!hasNode && !hasMovie) {
         Node node(actor, movies.size(), nodes.size());
         Movie movie(year, movies.size(), movie_title);
@@ -128,6 +152,7 @@ void ActorGraph::addNodeAndMovie(string actor, string movie_title, int year) {
 
         movies.push_back(movie);
         nodes.push_back(node);
+        branch_case = 0;
     } else if (hasNode && !hasMovie) {  // for actor we collected and new movie
         Movie movie(year, movies.size(), movie_title);
         Node node = nodes[nodeinfo[actor]];
@@ -138,6 +163,7 @@ void ActorGraph::addNodeAndMovie(string actor, string movie_title, int year) {
         movieinfo[movie_key] = movies.size();
 
         movies.push_back(movie);
+        branch_case = 1;
     } else if (!hasNode && hasMovie) {  // for movie we collected and new actor
         Movie movie = movies[movieinfo[movie_key]];
         Node node(actor, movie.getId(), nodes.size());
@@ -147,24 +173,31 @@ void ActorGraph::addNodeAndMovie(string actor, string movie_title, int year) {
         nodeinfo[actor] = nodes.size();
 
         nodes.push_back(node);
+        branch_case = 2;
     } else if (hasNode && hasMovie) {  // for both actor and movie we collected
         Node node = nodes[nodeinfo[actor]];
         Movie movie = movies[movieinfo[movie_key]];
         movies[movieinfo[movie_key]].addActor(node.getId());
         nodes[nodeinfo[actor]].addMovie(movie.getId());
+        branch_case = 3;
     } else {  // will not in this branch any time
         cout << "Branch error!" << endl;
     }
+
+    clock_t stat_end = clock();
+    node_stat[branch_case] +=
+        stat_end / (double)CLOCKS_PER_SEC - stat_start / (double)CLOCKS_PER_SEC;
 }
 
 /**
  * Adding edges to a graph only has nodes and movies.
  */
 void ActorGraph::buildEdges(bool use_weighted_edges) {
-    for (int i = 0; i < nodes.size(); i++) {
-        map<int, Edges> newmap;
-        edges.push_back(newmap);
-    }  // initialize the map
+    edges.resize(nodes.size(), {});
+    // // for (int i = 0; i < nodes.size(); i++) {
+    // //     map<int, Edges> newmap;
+    //     edges.push_back(newmap);
+    // }  // initialize the map
     for (int i = 0; i < movies.size(); i++) {
         int weight =
             (use_weighted_edges) ? (1 - (2019 - movies[i].getYear())) : 1;
@@ -175,8 +208,8 @@ void ActorGraph::buildEdges(bool use_weighted_edges) {
 /**
  * For each movie, add edges between all the actors who involve.
  */
-void ActorGraph::buildEdges4Movie(Movie movie, int weight) {
-    vector<int> actorsOfMovie = movie.getActor();
+void ActorGraph::buildEdges4Movie(Movie& movie, int weight) {
+    vector<int>& actorsOfMovie = movie.getActor();
     int id = movie.getId();
     for (int i = 0; i < actorsOfMovie.size(); i++) {
         for (int j = i + 1; j < actorsOfMovie.size(); j++) {
@@ -184,8 +217,8 @@ void ActorGraph::buildEdges4Movie(Movie movie, int weight) {
             int actorIdOne = actorsOfMovie[i];
             int actorIdTwo = actorsOfMovie[j];
             // two actors' map
-            map<int, Edges> mapOfActorOne = edges[actorIdOne];
-            map<int, Edges> mapOfActorTwo = edges[actorIdTwo];
+            map<int, Edges>& mapOfActorOne = edges[actorIdOne];
+            map<int, Edges>& mapOfActorTwo = edges[actorIdTwo];
             // if they already built an edge before
             if (mapOfActorOne.find(actorIdTwo) == mapOfActorOne.end()) {
                 Edges edge(actorIdOne, actorIdTwo, id, weight);
@@ -201,8 +234,8 @@ void ActorGraph::buildEdges4Movie(Movie movie, int weight) {
                 mapOfActorTwo[actorIdOne].addSharedMovie(id);
             }
             // push back the edge
-            edges[actorIdOne] = mapOfActorOne;
-            edges[actorIdTwo] = mapOfActorTwo;
+            // edges[actorIdOne] = mapOfActorOne;
+            // edges[actorIdTwo] = mapOfActorTwo;
             this->totalEdges += 2;  // count for total edge number
         }
     }

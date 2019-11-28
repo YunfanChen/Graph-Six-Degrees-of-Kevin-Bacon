@@ -21,8 +21,8 @@ Node::Node() {}
  * movieId: a movie this actor acted
  * id: the id of this actor.
  */
-Node::Node(string name, int movieId, int id) {
-    this->name = name;
+Node::Node(string& name, int movieId, int id) : name(name) {
+    // this->name = name;
     this->addMovie(movieId);
     this->id = id;
 }

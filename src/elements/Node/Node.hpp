@@ -33,7 +33,7 @@ class Node {
      * movieId: a movie this actor acted
      * id: the id of this actor.
      */
-    Node(string name, int movieId, int id);
+    Node(string& name, int movieId, int id);
 
     /**
      *  Add a movie to this node.

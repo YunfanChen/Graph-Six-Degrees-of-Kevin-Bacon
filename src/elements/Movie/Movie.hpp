@@ -34,7 +34,7 @@ class Movie {
      * id: the id of the movie
      * name: the name of the movie
      */
-    Movie(int year, int id, string name);
+    Movie(int year, int id, string& name);
 
     /**
      * Get the id of the movie
@@ -59,7 +59,7 @@ class Movie {
     /**
      * Get the actors involved in this movie
      */
-    vector<int> getActor();
+    vector<int>& getActor();
 };
 
 #endif

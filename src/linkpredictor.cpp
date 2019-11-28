@@ -8,6 +8,7 @@
  * the second where we predict new collaborations between actors.
  */
 #include <ActorGraph.hpp>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <queue>
@@ -42,28 +43,29 @@ struct NodePtrComp {
  */
 vector<string> predictCollaborated(int nodeId, ActorGraph* graph) {
     priority_queue<P, vector<P>, NodePtrComp> pq;  // priority queue
-    vector<map<int, Edges>> edges =
-        graph->getEdges();                     // get all edges in graph
-    vector<Node> nodes = graph->getNodes();    // get all nodes in graph
-    map<int, Edges> neighbor = edges[nodeId];  // given node's neighbor
+    vector<map<int, Edges>>& edges =
+        graph->getEdges();                      // get all edges in graph
+    vector<Node>& nodes = graph->getNodes();    // get all nodes in graph
+    map<int, Edges>& neighbor = edges[nodeId];  // given node's neighbor
     for (auto iter = neighbor.begin(); iter != neighbor.end(); iter++) {
         int neighborId = iter->first;
         int priority = 0;
         // all the neighbor initially set priority is 0
-        pq.push(P(nodes[neighborId], 0));
+        // pq.push(P(nodes[neighborId], 0));
+        pq.emplace(nodes[neighborId], 0);
         // then update each neighbor bode according to the rule
         for (auto iter2 = neighbor.begin(); iter2 != neighbor.end(); iter2++) {
             if (iter2 == iter) continue;
             int thirdNodeId = iter2->first;
-            map<int, Edges> neighborMap = edges[neighborId];
+            map<int, Edges>& neighborMap = edges[neighborId];
             if (neighborMap.find(thirdNodeId) == neighborMap.end()) {
                 continue;
             } else {
                 priority += neighborMap[thirdNodeId].getShared_movie().size() *
                             neighbor[thirdNodeId].getShared_movie().size();
             }
-            pq.push(P(nodes[neighborId],
-                      priority));  // push the node and its priority into pq
+            pq.emplace(nodes[neighborId],
+                       priority);  // push the node and its priority into pq
         }
     }
     set<string> top4;  // top4 node set, inorder to eliminate the same node
@@ -90,11 +92,11 @@ vector<string> predictCollaborated(int nodeId, ActorGraph* graph) {
  */
 vector<string> predictUnCollaborated(int nodeId, ActorGraph* graph) {
     priority_queue<P, vector<P>, NodePtrComp> pq;  // priority queue
-    vector<map<int, Edges>> edges =
-        graph->getEdges();                     // get all edges from graph
-    vector<Node> nodes = graph->getNodes();    // get all nodes from graph
-    vector<int> priority(nodes.size(), 0);     // priority vector for all nodes
-    map<int, Edges> neighbor = edges[nodeId];  // neighbor of the given node
+    vector<map<int, Edges>>& edges =
+        graph->getEdges();                      // get all edges from graph
+    vector<Node>& nodes = graph->getNodes();    // get all nodes from graph
+    vector<int> priority(nodes.size(), 0);      // priority vector for all nodes
+    map<int, Edges>& neighbor = edges[nodeId];  // neighbor of the given node
     vector<bool> visited(nodes.size(),
                          false);  // mark if a node has been visited
     visited[nodeId] = true;       // set the starter as visited
@@ -109,7 +111,7 @@ vector<string> predictUnCollaborated(int nodeId, ActorGraph* graph) {
     // then update every third node's priority
     for (auto iter = neighbor.begin(); iter != neighbor.end(); iter++) {
         int neighborLevel1Id = iter->first;
-        map<int, Edges> neighborOfNeighbor = edges[neighborLevel1Id];
+        map<int, Edges>& neighborOfNeighbor = edges[neighborLevel1Id];
         for (auto iter2 = neighborOfNeighbor.begin();
              iter2 != neighborOfNeighbor.end(); iter2++) {
             int neighborLevel2Id = iter2->first;
@@ -119,7 +121,7 @@ vector<string> predictUnCollaborated(int nodeId, ActorGraph* graph) {
                 priority[neighborLevel1Id] *
                 neighborOfNeighbor[neighborLevel2Id].getShared_movie().size();
 
-            pq.push(P(nodes[neighborLevel2Id], priority[neighborLevel2Id]));
+            pq.emplace(nodes[neighborLevel2Id], priority[neighborLevel2Id]);
         }
     }
     set<string> top4;  // top4 node set, inorder to eliminate the same node
@@ -148,7 +150,7 @@ void readFromFile(const char* in_filename, string outFileName,
     ifstream infile(in_filename);
 
     bool have_header = false;
-
+    clock_t predict_start = clock();
     ofstream fileout;
     fileout.open(outFileName, std::ofstream::app | std::ofstream::out);
     ofstream fileout2;
@@ -191,7 +193,7 @@ void readFromFile(const char* in_filename, string outFileName,
 
         vector<string> predictCol;
         vector<string> predictUnCol;
-        map<string, int> nodeinfo = graph->getNodeinfo();
+        unordered_map<string, int>& nodeinfo = graph->getNodeinfo();
         predictCol = predictCollaborated(nodeinfo[actorName], graph);
         predictUnCol = predictUnCollaborated(nodeinfo[actorName], graph);
 
@@ -211,6 +213,7 @@ void readFromFile(const char* in_filename, string outFileName,
         cerr << "Failed to read " << in_filename << "!\n";
         return;
     }
+    clock_t predict_end = clock();
     infile.close();
     fileout.close();
     fileout2.close();
@@ -224,3 +227,6 @@ int main(int argc, char* argv[]) {
     graph.loadFromFile(argv[1], false);
     readFromFile(argv[2], argv[3], argv[4], &graph);
 }
+// ./build/src/linkpredictor.cpp.executable /Code/cse100_pa4/data/imdb_2019.tsv
+// /Code/cse100_pa4/data/test_actors.tsv /Code/cse100_pa4/data/predict1.tsv
+// /Code/cse100_pa4/data/predict2.tsv

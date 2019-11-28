@@ -21,10 +21,10 @@ Movie::Movie() {}
  * id: the id of the movie
  * name: the name of the movie
  */
-Movie::Movie(int year, int id, string name) {
+Movie::Movie(int year, int id, string& name) : name(name) {
     this->year = year;
     this->id = id;
-    this->name = name;
+    // this->name = name;
 }
 
 /**
@@ -50,4 +50,4 @@ int Movie::getYear() { return this->year; }
 /**
  * Get the actors involved in this movie
  */
-vector<int> Movie::getActor() { return this->actors; }
+vector<int>& Movie::getActor() { return this->actors; }

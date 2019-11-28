@@ -16,6 +16,7 @@
 #include <Node.hpp>
 #include <iostream>
 #include <map>
+#include <unordered_map>
 
 using namespace std;
 
@@ -28,14 +29,16 @@ class ActorGraph {
     vector<Movie> movies;           // save index and movie object relations
     vector<Node> nodes;             // save index and node object relations
     vector<map<int, Edges>> edges;  // save index of node and its edges
-    map<string, int> nodeinfo;      // key is actor's name, value is the index
-    map<string, int> movieinfo;     // key is movie's name, value is the index
-    int totalEdges;                 // the number of total edges
+    unordered_map<string, int>
+        nodeinfo;  // key is actor's name, value is the index
+    unordered_map<string, int>
+        movieinfo;   // key is movie's name, value is the index
+    int totalEdges;  // the number of total edges
 
     /**
      * Adding nodes and movies to an empty graph.
      */
-    void addNodeAndMovie(string actor, string movie_title, int year);
+    void addNodeAndMovie(string& actor, string& movie_title, int year);
 
     /**
      * Adding edges to a graph only has nodes and movies.
@@ -45,7 +48,7 @@ class ActorGraph {
     /**
      * For each movie, add edges between all the actors who involve.
      */
-    void buildEdges4Movie(Movie movie, int weight);
+    void buildEdges4Movie(Movie& movie, int weight);
 
   public:
     /**
@@ -83,7 +86,7 @@ class ActorGraph {
     /**
      *  return nodeinfo as a map.
      */
-    map<string, int>& getNodeinfo();
+    unordered_map<string, int>& getNodeinfo();
 };
 
 #endif  // ACTORGRAPH_HPP

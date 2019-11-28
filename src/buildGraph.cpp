@@ -15,5 +15,5 @@ using namespace std;
  */
 int main(int argc, char* argv[]) {
     ActorGraph ag;
-    ag.loadFromFile("/Code/cse100_pa4/data/imdb_small_sample.tsv", false);
+    ag.loadFromFile("/Code/cse100_pa4/data/imdb_middle_sample.tsv", false);
 }

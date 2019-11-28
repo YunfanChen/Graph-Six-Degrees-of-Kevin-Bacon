@@ -7,6 +7,7 @@
  * output the path in a file.
  */
 #include <ActorGraph.hpp>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <queue>
@@ -21,12 +22,12 @@ using namespace std;
  * finally return a path save in a vector<string>.
  */
 vector<string> bfs(int startId, int endId, ActorGraph* graph) {
-    vector<Node> nodes = graph->getNodes();             // get the node list
-    vector<map<int, Edges>> edges = graph->getEdges();  // get the edges list
-    vector<Movie> movies = graph->getMovies();          // get the movie list
+    vector<Node>& nodes = graph->getNodes();             // get the node list
+    vector<map<int, Edges>>& edges = graph->getEdges();  // get the edges list
+    vector<Movie>& movies = graph->getMovies();          // get the movie list
     vector<bool> visited(nodes.size(),
                          false);  // indicate whether this node has been visited
-    map<int, int> pre;            // save for pre node
+    unordered_map<int, int> pre;  // save for pre node
     bool find = false;            // flag indicate whether find the endpoint
     queue<int> q;                 // queue for bfs
     q.push(startId);              // add start node
@@ -34,7 +35,7 @@ vector<string> bfs(int startId, int endId, ActorGraph* graph) {
         int preId = q.front();
         q.pop();
         visited[preId] = true;  // this node has been visited
-        map<int, Edges> neighbor = edges[preId];
+        map<int, Edges>& neighbor = edges[preId];
         // iter all the neighbor node
         for (auto iter = neighbor.begin(); iter != neighbor.end(); iter++) {
             int neighborId = iter->first;
@@ -61,11 +62,11 @@ vector<string> bfs(int startId, int endId, ActorGraph* graph) {
     path.push_back(nodes[preId].getName());
     while (preId != startId) {
         int nextId = pre[preId];
-        map<int, Edges> mapp = edges[preId];
-        Edges edgee = mapp[nextId];
-        vector<int> shared_movie = edgee.getShared_movie();
+        map<int, Edges>& mapp = edges[preId];
+        Edges& edgee = mapp[nextId];
+        vector<int>& shared_movie = edgee.getShared_movie();
         int movieId = shared_movie[0];
-        Movie movie = movies[movieId];
+        Movie& movie = movies[movieId];
         string movie_info =
             movie.getName() + "#@" +
             to_string(movie.getYear());  // the movie they shared
@@ -85,7 +86,7 @@ void readFromFile(const char* in_filename, string outFileName,
     ifstream infile(in_filename);
 
     bool have_header = false;
-
+    clock_t bfs_start = clock();
     ofstream fileout;
     fileout.open(outFileName, std::ofstream::app | std::ofstream::out);
 
@@ -125,7 +126,7 @@ void readFromFile(const char* in_filename, string outFileName,
         string actorTwo(record[1]);
 
         vector<string> path;
-        map<string, int> nodeinfo = graph->getNodeinfo();
+        unordered_map<string, int>& nodeinfo = graph->getNodeinfo();
         path = bfs(nodeinfo[actorOne], nodeinfo[actorTwo], graph);
 
         for (int i = path.size() - 1; i >= 0; i--) {
@@ -142,6 +143,11 @@ void readFromFile(const char* in_filename, string outFileName,
         cerr << "Failed to read " << in_filename << "!\n";
         return;
     }
+    clock_t bfs_end = clock();
+    // cout << "BFS time is: "
+    //      << bfs_end / (double)CLOCKS_PER_SEC -
+    //             bfs_start / (double)CLOCKS_PER_SEC
+    //      << endl;
     infile.close();
     fileout.close();
 }
