@@ -53,7 +53,6 @@ vector<string> bfs(int startId, int endId, ActorGraph* graph) {
             }
         }
     }
-
     vector<string> path;  // save the path for both movie an actor
     if (find == false) {
         return path;  // cannot find the endnode, then they are unconnected
@@ -144,10 +143,6 @@ void readFromFile(const char* in_filename, string outFileName,
         return;
     }
     clock_t bfs_end = clock();
-    // cout << "BFS time is: "
-    //      << bfs_end / (double)CLOCKS_PER_SEC -
-    //             bfs_start / (double)CLOCKS_PER_SEC
-    //      << endl;
     infile.close();
     fileout.close();
 }

@@ -17,7 +17,6 @@
 
 using namespace std;
 
-/******************************** stat *********************************/
 vector<double> node_stat(4, 0.0);
 
 /**
@@ -107,23 +106,9 @@ bool ActorGraph::loadFromFile(const char* in_filename,
     infile.close();
 
     clock_t read_end = clock();
-    // cout << "stat result: \n";
-    // cout << "\t0: " << node_stat[0] << endl;
-    // cout << "\t1: " << node_stat[1] << endl;
-    // cout << "\t2: " << node_stat[2] << endl;
-    // cout << "\t3: " << node_stat[3] << endl;
-    // cout << "total read time: "
-    //      << read_end / (double)CLOCKS_PER_SEC -
-    //             read_start / (double)CLOCKS_PER_SEC
-    //      << endl;
-    // add edges
     clock_t edge_start = clock();
     buildEdges(use_weighted_edges);
     clock_t edge_end = clock();
-    // cout << "edge stat time: "
-    //      << edge_end / (double)CLOCKS_PER_SEC -
-    //             edge_start / (double)CLOCKS_PER_SEC
-    //      << endl;
     return true;
 }
 
@@ -139,7 +124,6 @@ void ActorGraph::addNodeAndMovie(string& actor, string& movie_title, int year) {
     bool hasMovie =
         (movieinfo.find(movie_key) == movieinfo.end()) ? false : true;
     // for new movie and new actor
-    /******************************** stat *********************************/
     clock_t stat_start = clock();
     int branch_case = 0;
     if (!hasNode && !hasMovie) {
@@ -194,10 +178,6 @@ void ActorGraph::addNodeAndMovie(string& actor, string& movie_title, int year) {
  */
 void ActorGraph::buildEdges(bool use_weighted_edges) {
     edges.resize(nodes.size(), {});
-    // // for (int i = 0; i < nodes.size(); i++) {
-    // //     map<int, Edges> newmap;
-    //     edges.push_back(newmap);
-    // }  // initialize the map
     for (int i = 0; i < movies.size(); i++) {
         int weight =
             (use_weighted_edges) ? (1 - (2019 - movies[i].getYear())) : 1;
@@ -234,8 +214,6 @@ void ActorGraph::buildEdges4Movie(Movie& movie, int weight) {
                 mapOfActorTwo[actorIdOne].addSharedMovie(id);
             }
             // push back the edge
-            // edges[actorIdOne] = mapOfActorOne;
-            // edges[actorIdTwo] = mapOfActorTwo;
             this->totalEdges += 2;  // count for total edge number
         }
     }

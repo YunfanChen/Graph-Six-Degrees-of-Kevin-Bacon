@@ -51,7 +51,6 @@ vector<string> predictCollaborated(int nodeId, ActorGraph* graph) {
         int neighborId = iter->first;
         int priority = 0;
         // all the neighbor initially set priority is 0
-        // pq.push(P(nodes[neighborId], 0));
         pq.emplace(nodes[neighborId], 0);
         // then update each neighbor bode according to the rule
         for (auto iter2 = neighbor.begin(); iter2 != neighbor.end(); iter2++) {
@@ -227,6 +226,3 @@ int main(int argc, char* argv[]) {
     graph.loadFromFile(argv[1], false);
     readFromFile(argv[2], argv[3], argv[4], &graph);
 }
-// ./build/src/linkpredictor.cpp.executable /Code/cse100_pa4/data/imdb_2019.tsv
-// /Code/cse100_pa4/data/test_actors.tsv /Code/cse100_pa4/data/predict1.tsv
-// /Code/cse100_pa4/data/predict2.tsv
