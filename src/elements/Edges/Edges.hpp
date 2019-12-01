@@ -55,6 +55,11 @@ class Edges {
      * Get the shared_movie
      */
     vector<int>& getShared_movie();
+
+    /**
+     * Get the weight of this edge
+     */
+    int getWeight();
 };
 
 #endif

@@ -180,7 +180,7 @@ void ActorGraph::buildEdges(bool use_weighted_edges) {
     edges.resize(nodes.size(), {});
     for (int i = 0; i < movies.size(); i++) {
         int weight =
-            (use_weighted_edges) ? (1 - (2019 - movies[i].getYear())) : 1;
+            (use_weighted_edges) ? (1 + (2019 - movies[i].getYear())) : 1;
         buildEdges4Movie(movies[i], weight);
     }  // for every movie, build edges in it according to actors involved
 }

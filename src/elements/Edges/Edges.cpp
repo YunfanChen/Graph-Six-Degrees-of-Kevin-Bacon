@@ -55,3 +55,8 @@ void Edges::addSharedMovie(int movieId) {
  * Reset the weight of this edge
  */
 void Edges::setWeight(int weight) { this->weight = weight; }
+
+/**
+ * Get the weight of this edge
+ */
+int Edges::getWeight() { return this->weight; }

@@ -15,5 +15,9 @@ using namespace std;
  */
 int main(int argc, char* argv[]) {
     ActorGraph ag;
-    ag.loadFromFile("/Code/cse100_pa4/data/imdb_middle_sample.tsv", false);
+    ag.loadFromFile("/Code/cse100_pa4/data/imdb_middle_sample.tsv", true);
+    map<int, Edges>& edges = ag.getEdges()[0];
+    for (int i = 0; i < edges.size(); i++) {
+        if (edges[i].getWeight() != 1) cout << edges[i].getWeight() << endl;
+    }
 }
