@@ -21,6 +21,7 @@ class Movie {
     int id;              // the id of the movie
     string name;         // the name of the movie
     vector<int> actors;  // actors involved in this movie
+    int weight;          // the weight of this movie
 
   public:
     /**
@@ -60,6 +61,16 @@ class Movie {
      * Get the actors involved in this movie
      */
     vector<int>& getActor();
+
+    /**
+     * Get the weight of this movie
+     */
+    int getWeight();
+
+    /**
+     * Reset the weight of this edge
+     */
+    void setWeight(int weight);
 };
 
 #endif

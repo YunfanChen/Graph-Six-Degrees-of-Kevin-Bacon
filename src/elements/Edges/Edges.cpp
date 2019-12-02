@@ -27,11 +27,10 @@ vector<int>& Edges::getShared_movie() { return shared_movie; }
  * movieId: one movie id they act together
  * weight: the weight of this edge
  */
-Edges::Edges(int node_one, int node_two, int movieId, int weight) {
+Edges::Edges(int node_one, int node_two, int movieId) {
     this->node_one = node_one;
     this->node_two = node_two;
     addSharedMovie(movieId);
-    this->weight = weight;
 }
 
 /**
@@ -41,7 +40,6 @@ Edges::Edges(const Edges& edge) {
     this->node_one = edge.node_one;
     this->node_two = edge.node_two;
     this->shared_movie = edge.shared_movie;
-    this->weight = edge.weight;
 }
 
 /**
@@ -50,13 +48,3 @@ Edges::Edges(const Edges& edge) {
 void Edges::addSharedMovie(int movieId) {
     this->shared_movie.push_back(movieId);
 }
-
-/**
- * Reset the weight of this edge
- */
-void Edges::setWeight(int weight) { this->weight = weight; }
-
-/**
- * Get the weight of this edge
- */
-int Edges::getWeight() { return this->weight; }

@@ -19,7 +19,6 @@ class Edges {
   private:
     int node_one, node_two;    // two actors' node ID
     vector<int> shared_movie;  // the movie history they act together
-    int weight;                // the weight of this edge
 
   public:
     /**
@@ -34,7 +33,7 @@ class Edges {
      * movieId: one movie id they act together
      * weight: the weight of this edge
      */
-    Edges(int node_one, int node_two, int movieId, int weight);
+    Edges(int node_one, int node_two, int movieId);
 
     /**
      * copy constructor
@@ -47,19 +46,9 @@ class Edges {
     void addSharedMovie(int movieId);
 
     /**
-     * Reset the weight of this edge
-     */
-    void setWeight(int weight);
-
-    /**
      * Get the shared_movie
      */
     vector<int>& getShared_movie();
-
-    /**
-     * Get the weight of this edge
-     */
-    int getWeight();
 };
 
 #endif

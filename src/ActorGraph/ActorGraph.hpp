@@ -87,6 +87,11 @@ class ActorGraph {
      *  return nodeinfo as a map.
      */
     unordered_map<string, int>& getNodeinfo();
+
+    /**
+     *  return movieinfo as a map.
+     */
+    unordered_map<string, int>& getMovieinfo();
 };
 
 #endif  // ACTORGRAPH_HPP

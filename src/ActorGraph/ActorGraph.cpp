@@ -45,6 +45,11 @@ vector<map<int, Edges>>& ActorGraph::getEdges() { return edges; }
 unordered_map<string, int>& ActorGraph::getNodeinfo() { return nodeinfo; }
 
 /**
+ *  return movieinfo as a map.
+ */
+unordered_map<string, int>& ActorGraph::getMovieinfo() { return movieinfo; }
+
+/**
  *
  * Load the graph from a tab-delimited file of actor->movie relationships.
  *
@@ -190,6 +195,7 @@ void ActorGraph::buildEdges(bool use_weighted_edges) {
  */
 void ActorGraph::buildEdges4Movie(Movie& movie, int weight) {
     vector<int>& actorsOfMovie = movie.getActor();
+    movie.setWeight(weight);
     int id = movie.getId();
     for (int i = 0; i < actorsOfMovie.size(); i++) {
         for (int j = i + 1; j < actorsOfMovie.size(); j++) {
@@ -201,14 +207,14 @@ void ActorGraph::buildEdges4Movie(Movie& movie, int weight) {
             map<int, Edges>& mapOfActorTwo = edges[actorIdTwo];
             // if they already built an edge before
             if (mapOfActorOne.find(actorIdTwo) == mapOfActorOne.end()) {
-                Edges edge(actorIdOne, actorIdTwo, id, weight);
+                Edges edge(actorIdOne, actorIdTwo, id);
                 mapOfActorOne[actorIdTwo] = edge;
             } else {
                 mapOfActorOne[actorIdTwo].addSharedMovie(id);
             }
             // if they already built an edge before
             if (mapOfActorTwo.find(actorIdOne) == mapOfActorTwo.end()) {
-                Edges edge(actorIdTwo, actorIdOne, id, weight);
+                Edges edge(actorIdTwo, actorIdOne, id);
                 mapOfActorTwo[actorIdOne] = edge;
             } else {
                 mapOfActorTwo[actorIdOne].addSharedMovie(id);

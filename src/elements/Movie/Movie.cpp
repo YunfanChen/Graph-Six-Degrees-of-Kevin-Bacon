@@ -51,3 +51,13 @@ int Movie::getYear() { return this->year; }
  * Get the actors involved in this movie
  */
 vector<int>& Movie::getActor() { return this->actors; }
+
+/**
+ * Reset the weight of this movie
+ */
+void Movie::setWeight(int weight) { this->weight = weight; }
+
+/**
+ * Get the weight of this movie
+ */
+int Movie::getWeight() { return this->weight; }

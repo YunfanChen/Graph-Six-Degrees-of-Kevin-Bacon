@@ -14,8 +14,94 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#define INF 0x7fffffff
 
 using namespace std;
+typedef pair<Node, int> P;
+
+/**
+ * Comparator of Node. In priority queue, Node lower weight(int)
+ * has higher priority, and if count is the same, Node.getName() with lower
+ * symbol has higher prioruty.
+ */
+struct NodePtrComp {
+    /* Implement a comparator of node in struct NodePtrComp. */
+    bool operator()(P& p1, P& p2) const {
+        if (p1.second == p2.second) {
+            return p1.first.getName() > p2.first.getName();
+        }
+        return p1.second > p2.second;
+    }
+};
+
+Movie getSmallestWeight(ActorGraph* graph, Edges* edge) {
+    vector<int>& sharedMovie = edge->getShared_movie();
+    vector<Movie>& movies = graph->getMovies();
+    int minWeight = 100000;
+    int minId = -1;
+    for (int i = 0; i < sharedMovie.size(); i++) {
+        if (minWeight > movies[sharedMovie[i]].getWeight()) {
+            minWeight = movies[sharedMovie[i]].getWeight();
+            minId = movies[sharedMovie[i]].getId();
+        }
+    }
+    return movies[minId];
+}
+
+vector<string> dijkstra(ActorGraph* graph, int startNode, int endNode) {
+    vector<Node>& nodes = graph->getNodes();
+    vector<int> distance(nodes.size(), INF);
+    distance[startNode] = 0;
+    vector<map<int, Edges>>& edges = graph->getEdges();
+    map<int, Edges>& neighbor = edges[startNode];
+    priority_queue<P, vector<P>, NodePtrComp> pq;
+    map<int, int> parent;
+
+    pq.emplace(nodes[startNode], 0);
+    while (!pq.empty()) {
+        P pair = pq.top();
+        pq.pop();
+        Node curNode = pair.first;
+        int curWeight = pair.second;
+        if (curWeight >= distance[endNode]) break;
+        int curNodeId = curNode.getId();
+        map<int, Edges>& neighborOfNeighbor = edges[curNodeId];
+        for (auto iter = neighborOfNeighbor.begin();
+             iter != neighborOfNeighbor.end(); iter++) {
+            cout << "If " << distance[iter->first] << " > "
+                 << distance[curNodeId] << " + "
+                 << getSmallestWeight(graph, &iter->second).getWeight() << "?"
+                 << endl;
+            if (distance[iter->first] >
+                distance[curNodeId] +
+                    getSmallestWeight(graph, &iter->second).getWeight()) {
+                cout << "yes" << endl;
+                distance[iter->first] =
+                    distance[curNodeId] +
+                    getSmallestWeight(graph, &iter->second).getWeight();
+                cout << "now distance is : " << distance[iter->first] << endl;
+                parent[iter->first] = curNodeId;
+                pq.emplace(nodes[iter->first], distance[iter->first]);
+            }
+            cout << "no" << endl;
+        }
+    }
+    vector<string> path;
+    if (distance[endNode] == INF) return path;
+    if (startNode == endNode) return path;
+    int curNode = endNode;
+    while (curNode != startNode) {
+        path.push_back(nodes[curNode].getName());
+        Movie curMovie =
+            getSmallestWeight(graph, &edges[curNode][parent[curNode]]);
+        string curMovieInfo =
+            curMovie.getName() + "#@" + to_string(curMovie.getYear());
+        path.push_back(curMovieInfo);
+        curNode = parent[curNode];
+    }
+    path.push_back(nodes[curNode].getName());
+    return path;
+}
 
 /**
  * This function is implementing BFS from one actor node in the graph. And
@@ -81,7 +167,7 @@ vector<string> bfs(int startId, int endId, ActorGraph* graph) {
  * in a output file.
  */
 void readFromFile(const char* in_filename, string outFileName,
-                  ActorGraph* graph) {
+                  ActorGraph* graph, bool weighted) {
     ifstream infile(in_filename);
 
     bool have_header = false;
@@ -126,7 +212,11 @@ void readFromFile(const char* in_filename, string outFileName,
 
         vector<string> path;
         unordered_map<string, int>& nodeinfo = graph->getNodeinfo();
-        path = bfs(nodeinfo[actorOne], nodeinfo[actorTwo], graph);
+        if (weighted) {
+            path = dijkstra(graph, nodeinfo[actorOne], nodeinfo[actorTwo]);
+        } else {
+            path = bfs(nodeinfo[actorOne], nodeinfo[actorTwo], graph);
+        }
 
         for (int i = path.size() - 1; i >= 0; i--) {
             if (i != path.size() - 1 && i % 2 == 0) fileout << ">";
@@ -157,5 +247,6 @@ int main(int argc, char* argv[]) {
     ActorGraph graph;
     graph.loadFromFile(argv[1], weighted);
     string outFileName(argv[4]);
-    readFromFile(argv[3], outFileName, &graph);
+    readFromFile(argv[3], outFileName, &graph, weighted);
 }
+// /Code/cse100_pa4/data/my_out_paths_unweighted.tsv
