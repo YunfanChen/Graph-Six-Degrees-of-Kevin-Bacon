@@ -13,14 +13,16 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#define INF 0x7fffffff
 
 using namespace std;
-#define INF 0x7fffffff
+
 typedef pair<Edges, int> P;
-vector<vector<int>> unionNodeSet;
-unordered_map<int, int> father;
-vector<Edges> treePath;
-int nodeNum = 0, edgeNum = 0, weightNum = 0;
+vector<vector<int>> unionNodeSet;  // save all the node in vector
+unordered_map<int, int>
+    father;              // indicate the node's relationship in Union and Find
+vector<Edges> treePath;  // final output of Edges.
+
 /**
  * Comparator of Edges. In priority queue, Node lower weight(int)
  * has higher priority.
@@ -30,18 +32,20 @@ struct EdgesPtrComp {
     bool operator()(P& p1, P& p2) const { return p1.second > p2.second; }
 };
 
+/**
+ * Find the root parent of a node.
+ */
 int find(int nodeId) {
-    while (father[nodeId] != nodeId) nodeId = father[nodeId];
+    while (father[nodeId] != nodeId) {
+        father[nodeId] = father[father[nodeId]];
+        nodeId = father[nodeId];
+    }
     return nodeId;
 }
 
-void setFather(vector<int> child, int fatherId) {
-    for (int i = 0; i < child.size(); i++) {
-        father[child[i]] = fatherId;
-    }
-    return;
-}
-
+/**
+ * Read an Edge, and get the union of nodes.
+ */
 void Union(Node* nodeOne, Node* nodeTwo, Edges& edge, vector<Node>& nodes) {
     int fatherOne = find(nodeOne->getId());
     int fatherTwo = find(nodeTwo->getId());
@@ -57,26 +61,18 @@ void Union(Node* nodeOne, Node* nodeTwo, Edges& edge, vector<Node>& nodes) {
         flag2 = true;
     }
     if (fatherOne != fatherTwo) {
-        vector<int>& child = unionNodeSet[fatherTwo];
-        setFather(child, fatherOne);
-        unionNodeSet[fatherOne].insert(unionNodeSet[fatherOne].end(),
-                                       unionNodeSet[fatherTwo].begin(),
-                                       unionNodeSet[fatherTwo].end());
+        father[fatherTwo] = fatherOne;
         int curWeight = nodes[fatherOne].getTotalWeight() +
                         nodes[fatherTwo].getTotalWeight();
         if (flag1 && flag2) curWeight = curWeight / 2;
-        // cout << "for node " << nodeOne->getId() << " and " <<
-        // nodeTwo->getId()
-        //      << " , the weight of father " << fatherOne << " is " <<
-        //      curWeight
-        //      << endl;
         nodes[fatherOne].setTotalWeight(curWeight);
-        unionNodeSet[fatherTwo].clear();
         treePath.push_back(edge);
-        // cout << "-------" << edge.getSmallestWeight() << "-----" << endl;
     }
 }
 
+/**
+ * For a given edge, find the smallest weight of movie in it.
+ */
 Movie getSmallestWeight(ActorGraph* graph, Edges& edge) {
     vector<int>& sharedMovie = edge.getShared_movie();
     vector<Movie>& movies = graph->getMovies();
@@ -91,6 +87,9 @@ Movie getSmallestWeight(ActorGraph* graph, Edges& edge) {
     return movies[minId];
 }
 
+/**
+ * Find the minimum spanning tree.
+ */
 void kruskal(ActorGraph* graph) {
     vector<Node>& nodes = graph->getNodes();
     priority_queue<P, vector<P>, EdgesPtrComp> pq;
@@ -112,18 +111,20 @@ void kruskal(ActorGraph* graph) {
         }
     }
     while (!pq.empty()) {
+        if (treePath.size() == nodes.size() - 1) break;
         P pair = pq.top();
         pq.pop();
         Edges& e = pair.first;
         int nodeOne = e.getNodeOne();
         int nodeTwo = e.getNodeTwo();
-        // cout << "weight movie of " << nodeOne << " and " << nodeTwo << ": "
-        //      << e.getWeightMovie() << endl;
         Union(&nodes[nodeOne], &nodes[nodeTwo], e, nodes);
     }
     return;
 }
 
+/**
+ * Write file out.
+ */
 void writeFile(string outFileName, ActorGraph* graph) {
     ofstream fileout;
     fileout.open(outFileName, std::ofstream::app | std::ofstream::out);
@@ -147,7 +148,7 @@ void writeFile(string outFileName, ActorGraph* graph) {
                 << nodes[nodeTwo].getName() << ")" << endl;
     }
     int rootId = find(0);
-    fileout << "#NODE CONNECTED: " << unionNodeSet[rootId].size() << endl;
+    fileout << "#NODE CONNECTED: " << nodes.size() << endl;
     fileout << "#EDGE CHOSEN: " << treePath.size() << endl;
     fileout << "TOTAL EDGE WEIGHTS: " << nodes[rootId].getTotalWeight();
     return;

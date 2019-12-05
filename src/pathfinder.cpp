@@ -34,6 +34,9 @@ struct NodePtrComp {
     }
 };
 
+/**
+ * For a given edge, find the smallest weight of movie in it.
+ */
 Movie getSmallestWeight(ActorGraph* graph, Edges* edge) {
     vector<int>& sharedMovie = edge->getShared_movie();
     vector<Movie>& movies = graph->getMovies();
@@ -48,6 +51,9 @@ Movie getSmallestWeight(ActorGraph* graph, Edges* edge) {
     return movies[minId];
 }
 
+/**
+ * Apply Dijkstra algorithm to find a shortest path between two nodes.
+ */
 vector<string> dijkstra(ActorGraph* graph, int startNode, int endNode) {
     vector<Node>& nodes = graph->getNodes();
     vector<int> distance(nodes.size(), INF);
@@ -68,24 +74,15 @@ vector<string> dijkstra(ActorGraph* graph, int startNode, int endNode) {
         map<int, Edges>& neighborOfNeighbor = edges[curNodeId];
         for (auto iter = neighborOfNeighbor.begin();
              iter != neighborOfNeighbor.end(); iter++) {
-            // cout << "If " << distance[iter->first] << " > "
-            //      << distance[curNodeId] << " + "
-            //      << getSmallestWeight(graph, &iter->second).getWeight() <<
-            //      "?"
-            //      << endl;
             if (distance[iter->first] >
                 distance[curNodeId] +
                     getSmallestWeight(graph, &iter->second).getWeight()) {
-                // cout << "yes" << endl;
                 distance[iter->first] =
                     distance[curNodeId] +
                     getSmallestWeight(graph, &iter->second).getWeight();
-                // cout << "now distance is : " << distance[iter->first] <<
-                // endl;
                 parent[iter->first] = curNodeId;
                 pq.emplace(nodes[iter->first], distance[iter->first]);
             }
-            // cout << "no" << endl;
         }
     }
     vector<string> path;
@@ -251,4 +248,3 @@ int main(int argc, char* argv[]) {
     string outFileName(argv[4]);
     readFromFile(argv[3], outFileName, &graph, weighted);
 }
-// /Code/cse100_pa4/data/my_out_paths_unweighted.tsv
