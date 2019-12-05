@@ -20,6 +20,7 @@ class Node {
     string name;
     vector<int> movies;
     int id;
+    int totalEdge = 0, totalNode = 0, totalWeight = 0;
 
   public:
     /**
@@ -54,6 +55,36 @@ class Node {
      * Get the name of this actor
      */
     string getName();
+
+    /**
+     * Set total number of edge.
+     */
+    void setTotalEdge(int edgeNum);
+
+    /**
+     * Get the total number of Edge.
+     */
+    int getTotalEdge();
+
+    /**
+     * Set total number of node.
+     */
+    void setTotalNode(int nodeNum);
+
+    /**
+     * Get the total number of node.
+     */
+    int getTotalNode();
+
+    /**
+     * Set total weight.
+     */
+    void setTotalWeight(int weightNum);
+
+    /**
+     * Get the total weight.
+     */
+    int getTotalWeight();
 };
 
 #endif

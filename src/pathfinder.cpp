@@ -37,7 +37,7 @@ struct NodePtrComp {
 Movie getSmallestWeight(ActorGraph* graph, Edges* edge) {
     vector<int>& sharedMovie = edge->getShared_movie();
     vector<Movie>& movies = graph->getMovies();
-    int minWeight = 100000;
+    int minWeight = INF;
     int minId = -1;
     for (int i = 0; i < sharedMovie.size(); i++) {
         if (minWeight > movies[sharedMovie[i]].getWeight()) {
@@ -68,22 +68,24 @@ vector<string> dijkstra(ActorGraph* graph, int startNode, int endNode) {
         map<int, Edges>& neighborOfNeighbor = edges[curNodeId];
         for (auto iter = neighborOfNeighbor.begin();
              iter != neighborOfNeighbor.end(); iter++) {
-            cout << "If " << distance[iter->first] << " > "
-                 << distance[curNodeId] << " + "
-                 << getSmallestWeight(graph, &iter->second).getWeight() << "?"
-                 << endl;
+            // cout << "If " << distance[iter->first] << " > "
+            //      << distance[curNodeId] << " + "
+            //      << getSmallestWeight(graph, &iter->second).getWeight() <<
+            //      "?"
+            //      << endl;
             if (distance[iter->first] >
                 distance[curNodeId] +
                     getSmallestWeight(graph, &iter->second).getWeight()) {
-                cout << "yes" << endl;
+                // cout << "yes" << endl;
                 distance[iter->first] =
                     distance[curNodeId] +
                     getSmallestWeight(graph, &iter->second).getWeight();
-                cout << "now distance is : " << distance[iter->first] << endl;
+                // cout << "now distance is : " << distance[iter->first] <<
+                // endl;
                 parent[iter->first] = curNodeId;
                 pq.emplace(nodes[iter->first], distance[iter->first]);
             }
-            cout << "no" << endl;
+            // cout << "no" << endl;
         }
     }
     vector<string> path;

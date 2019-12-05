@@ -31,6 +31,8 @@ Edges::Edges(int node_one, int node_two, int movieId) {
     this->node_one = node_one;
     this->node_two = node_two;
     addSharedMovie(movieId);
+    this->smallestWeight = 0;
+    this->weightMovie = 0;
 }
 
 /**
@@ -40,6 +42,8 @@ Edges::Edges(const Edges& edge) {
     this->node_one = edge.node_one;
     this->node_two = edge.node_two;
     this->shared_movie = edge.shared_movie;
+    this->weightMovie = edge.weightMovie;
+    this->smallestWeight = edge.smallestWeight;
 }
 
 /**
@@ -48,3 +52,33 @@ Edges::Edges(const Edges& edge) {
 void Edges::addSharedMovie(int movieId) {
     this->shared_movie.push_back(movieId);
 }
+
+/**
+ * Set a movie as the Edge's weighted movie.
+ */
+void Edges::setWeightMovie(int movieId) { this->weightMovie = movieId; }
+
+/**
+ * Get the weighted movie of this Edge.
+ */
+int Edges::getWeightMovie() { return this->weightMovie; }
+
+/**
+ * Get one of the node in this edge.
+ */
+int Edges::getNodeOne() { return node_one; }
+
+/**
+ * Get one of the node in this edge.
+ */
+int Edges::getNodeTwo() { return node_two; }
+
+/**
+ * Set a smallest weight for an edge.
+ */
+void Edges::setSmallestWeight(int weight) { this->smallestWeight = weight; }
+
+/**
+ * Get the smallest weight of this Edge.
+ */
+int Edges::getSmallestWeight() { return this->smallestWeight; }

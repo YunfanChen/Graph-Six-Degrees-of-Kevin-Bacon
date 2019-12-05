@@ -19,6 +19,8 @@ class Edges {
   private:
     int node_one, node_two;    // two actors' node ID
     vector<int> shared_movie;  // the movie history they act together
+    int weightMovie;
+    int smallestWeight;
 
   public:
     /**
@@ -49,6 +51,36 @@ class Edges {
      * Get the shared_movie
      */
     vector<int>& getShared_movie();
+
+    /**
+     * Set a movie as the Edge's weighted movie.
+     */
+    void setWeightMovie(int movieId);
+
+    /**
+     * Get the weighted movie of this Edge.
+     */
+    int getWeightMovie();
+
+    /**
+     * Get one of the node in this edge.
+     */
+    int getNodeOne();
+
+    /**
+     * Get one of the node in this edge.
+     */
+    int getNodeTwo();
+
+    /**
+     * Set a smallest weight for an edge.
+     */
+    void setSmallestWeight(int weight);
+
+    /**
+     * Get the smallest weight of this Edge.
+     */
+    int getSmallestWeight();
 };
 
 #endif
